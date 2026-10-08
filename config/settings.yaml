@@ -92,3 +92,17 @@ collection:
       - {site: stackoverflow, tag: mujoco}
       - {site: stackoverflow, tag: moveit}
       - {site: stackoverflow, tag: nvidia-isaac}
+
+# Stage 2: parsing & cleaning rules (raw -> data/processed/documents.jsonl)
+processing:
+  min_chars: 200                 # shorter cleaned texts carry no answer; dropped as "too_short"
+  noise_names: [THIRD_PARTY_NOTICE.md, THIRD_PARTY_LICENSES.md, LICENSE.md, LICENSE.txt, LICENSE.rst,
+                CODE_OF_CONDUCT.md, SECURITY.md, PULL_REQUEST_TEMPLATE.md, SKILL.md, CODEOWNERS.md,
+                genindex.html, search.html, py-modindex.html]
+  noise_dirs: [.github, .docker, .claude, skills, node_modules, _templates, .vscode, .gitlab]
+  bot_logins: [github-actions, stale, mergify, codecov, dependabot, copilot, isaaclab-bot, copilot-swe-agent]
+  # Sphinx build-time placeholders, filled with the real values per version
+  substitutions:
+    ros2:
+      jazzy:   {DISTRO: jazzy,   DISTRO_TITLE: Jazzy,   DISTRO_TITLE_FULL: Jazzy Jalisco}
+      lyrical: {DISTRO: lyrical, DISTRO_TITLE: Lyrical, DISTRO_TITLE_FULL: Lyrical Luth}

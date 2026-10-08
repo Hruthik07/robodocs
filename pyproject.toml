@@ -15,6 +15,9 @@ dependencies = [
     "pyyaml>=6.0",         # read config/settings.yaml
     "python-dotenv>=1.0",  # load secrets (API keys) from .env
     "tqdm>=4.66",          # progress bars for long-running jobs
+    "beautifulsoup4>=4.12", # Stage 2: pick the article out of docs-website HTML
+    "markdownify>=0.13",   # Stage 2: HTML -> Markdown (keeps headings, code, tables)
+    "lxml>=5.0",           # Stage 2: fast HTML parser backend for bs4
 ]
 
 [project.optional-dependencies]

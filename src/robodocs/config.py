@@ -87,9 +87,18 @@ class CollectionConfig(BaseModel):
     stackexchange: StackExchangeConfig
 
 
+class ProcessingConfig(BaseModel):
+    min_chars: int
+    noise_names: list[str]
+    noise_dirs: list[str]
+    bot_logins: list[str]
+    substitutions: dict[str, dict[str, dict[str, str]]] = {}   # framework -> version -> {KEY: value}
+
+
 class Settings(BaseModel):
     paths: PathsConfig
     collection: CollectionConfig
+    processing: ProcessingConfig
 
     def abs_path(self, p: Path) -> Path:
         """Resolve a config path relative to the project root."""
