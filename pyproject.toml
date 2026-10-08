@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "robodocs"
+version = "0.1.0"
+description = "RoboDocs: a version-aware RAG assistant for robotics developers"
+requires-python = ">=3.11"
+# Dependencies are added stage by stage, so you see why each one exists.
+dependencies = [
+    "requests>=2.31",      # Stage 1: HTTP calls (GitHub, StackExchange)
+    "tenacity>=8.2",       # Stage 1: retry with backoff on failed requests
+    "pydantic>=2.6",       # typed data models + config validation
+    "pyyaml>=6.0",         # read config/settings.yaml
+    "python-dotenv>=1.0",  # load secrets (API keys) from .env
+    "tqdm>=4.66",          # progress bars for long-running jobs
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

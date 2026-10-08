@@ -1,0 +1,94 @@
+# RoboDocs configuration.
+# Rule: anything you might want to tune goes here, not hardcoded in Python.
+# Secrets (API keys) never go here -> they live in .env
+
+paths:
+  raw_data: data/raw              # untouched source data (cloned docs, API JSON)
+  processed_data: data/processed  # cleaned, unified documents (Stage 2+)
+
+collection:
+  # D1-D6: official documentation, pulled straight from each project's git repo.
+  # One entry per (framework, version). `ref` is the git branch or tag to fetch,
+  # `paths` are the folders inside the repo that hold the docs.
+  # Versions checked against the real repos on 2026-10-07.
+  docs:
+    - framework: ros2
+      repo: ros2/ros2_documentation
+      versions: {jazzy: jazzy, lyrical: lyrical}        # version label: git ref
+      paths: [source]
+    - framework: nav2
+      repo: ros-navigation/docs.nav2.org
+      versions: {jazzy: jazzy, lyrical: lyrical}
+      paths: [.]
+    - framework: isaac_lab
+      repo: isaac-sim/IsaacLab
+      versions: {"2.3": release/2.3.0, "3.0": release/3.0.0}
+      paths: [docs]
+    - framework: isaac_sim
+      repo: isaac-sim/IsaacSim
+      versions: {"5.1": v5.1.0, "6.1": v6.1.0}
+      paths: [.]                                          # READMEs + changelogs across the repo
+    - framework: mujoco
+      repo: google-deepmind/mujoco
+      versions: {"3.15": 3.15.0}
+      paths: [doc]
+    # ros2_control: added after coverage audit v2 (3 of 10 gaps). 4 repos share one framework
+    # label, so each gets its own output folder via `name`. master = rolling (no lyrical branch yet).
+    - {framework: ros2_control, name: ros2_control, repo: ros-controls/ros2_control,
+       versions: {jazzy: jazzy, rolling: master}, paths: [.]}
+    - {framework: ros2_control, name: ros2_controllers, repo: ros-controls/ros2_controllers,
+       versions: {jazzy: jazzy, rolling: master}, paths: [.]}
+    - {framework: ros2_control, name: ros2_control_demos, repo: ros-controls/ros2_control_demos,
+       versions: {jazzy: jazzy, rolling: master}, paths: [.]}
+    - {framework: ros2_control, name: control.ros.org, repo: ros-controls/control.ros.org,
+       versions: {jazzy: jazzy, lyrical: lyrical}, paths: [.]}
+  docs_file_extensions: [.rst, .md]
+
+  # D5: docs that exist only as a website (Sphinx-built). The page list comes from the
+  # site's searchindex.js; pages are saved as raw HTML (text extraction = Stage 2).
+  # Isaac Sim tutorials / ROS 2 bridge / migration guides are NOT in its git repo.
+  web_docs:
+    delay_seconds: 0.5     # politeness: max 2 requests/second
+    sites:
+      - framework: isaac_sim
+        base_url: https://docs.isaacsim.omniverse.nvidia.com
+        versions: {"5.1": 5.1.0, "6.1": 6.1.0}   # version label: URL path segment
+
+  # D7-D8: GitHub closed issues (+ comments) and Discussions, via the GraphQL API.
+  # Raw = everything closed; quality filtering (resolved? has a fix?) happens in Stage 2.
+  github:
+    page_size: 25          # items per GraphQL request (auto-halved if GitHub times out)
+    repos:
+      - {repo: isaac-sim/IsaacLab,          framework: isaac_lab, discussions: true}
+      - {repo: isaac-sim/IsaacSim,          framework: isaac_sim, discussions: true}
+      - {repo: google-deepmind/mujoco,      framework: mujoco,    discussions: true}
+      - {repo: ros-navigation/navigation2,  framework: nav2,      discussions: true}
+      - {repo: moveit/moveit2,              framework: moveit2,   discussions: true}
+      - {repo: ros2/rclcpp,                 framework: ros2}
+      - {repo: ros2/rclpy,                  framework: ros2}
+      - {repo: ros2/rosbag2,                framework: ros2}
+      - {repo: ros2/geometry2,              framework: ros2}
+      - {repo: ros2/ros2_documentation,     framework: ros2}
+      - {repo: ros-controls/ros2_control,          framework: ros2_control}
+      - {repo: ros-controls/ros2_controllers,      framework: ros2_control}
+      - {repo: ros-controls/ros2_control_demos,    framework: ros2_control}
+
+  # D10: the owner's own project notes (team-knowledge use case UC5).
+  # Secrets/IPs are redacted on collection: retrieved text is later sent to a hosted LLM.
+  notes:
+    root: "~"                             # your home folder (expanded at runtime)
+    folders: [ISSAC, pybullet, embodied-ai-project]
+    include: ["**/*.md"]
+    exclude_names: [CLAUDE.md]            # assistant instructions, not knowledge
+    exclude_dirs: [.git, node_modules, .venv, venv, site-packages, __pycache__]
+
+  # D9: Stack Exchange Q&A. Robotics SE in full (incl. migrated ROS Answers; ~47k questions,
+  # mostly ROS 1 -> tagged/filtered in Stage 2) + in-scope tags from Stack Overflow.
+  # Isaac/MuJoCo are almost absent on SE (checked 2026-10-07): GitHub covers those.
+  stackexchange:
+    sources:
+      - {site: robotics}                       # no tag = every question on the site
+      - {site: stackoverflow, tag: ros2}
+      - {site: stackoverflow, tag: mujoco}
+      - {site: stackoverflow, tag: moveit}
+      - {site: stackoverflow, tag: nvidia-isaac}

@@ -1,0 +1,14 @@
+# secrets
+.env
+
+# data (regenerable from the pipeline; never commit)
+data/raw/*
+data/processed/*
+data/index/
+!data/**/.gitkeep
+
+# python
+__pycache__/
+*.egg-info/
+.pytest_cache/
+.venv/
