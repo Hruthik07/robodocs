@@ -106,3 +106,12 @@ processing:
     ros2:
       jazzy:   {DISTRO: jazzy,   DISTRO_TITLE: Jazzy,   DISTRO_TITLE_FULL: Jazzy Jalisco}
       lyrical: {DISTRO: lyrical, DISTRO_TITLE: Lyrical, DISTRO_TITLE_FULL: Lyrical Luth}
+
+# Stage 3: chunking (data/processed/documents.jsonl -> data/processed/chunks.jsonl)
+# Sizes in characters. ~3.5 chars/token for this code-heavy text, so max 1800 chars ~ 500 tokens,
+# which fits the 512-token limit of small local embedding models (Stage 4).
+chunking:
+  target_chars: 1200       # pack blocks up to about this size
+  max_chars: 1800          # hard limit per chunk body (context header comes on top)
+  min_chars: 250           # smaller sections are merged with their neighbour
+  question_context_chars: 300   # how much of the question is prepended to every answer chunk

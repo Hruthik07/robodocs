@@ -95,10 +95,18 @@ class ProcessingConfig(BaseModel):
     substitutions: dict[str, dict[str, dict[str, str]]] = {}   # framework -> version -> {KEY: value}
 
 
+class ChunkingConfig(BaseModel):
+    target_chars: int
+    max_chars: int
+    min_chars: int
+    question_context_chars: int
+
+
 class Settings(BaseModel):
     paths: PathsConfig
     collection: CollectionConfig
     processing: ProcessingConfig
+    chunking: ChunkingConfig
 
     def abs_path(self, p: Path) -> Path:
         """Resolve a config path relative to the project root."""
