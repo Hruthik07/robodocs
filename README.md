@@ -5,7 +5,7 @@ ROS 2, Nav2, MoveIt 2, ros2_control, Isaac Sim, Isaac Lab or MuJoCo, and get an 
 GitHub issues **for the version you actually use**, with links to the sources.
 
 > 🚧 Work in progress. Built stage by stage as an end-to-end RAG learning project.
-> **Stage 1 (data collection) is complete**; Stage 2 (parsing & cleaning) is next.
+> **Stages 1–3 are complete** (collection, parsing & cleaning, chunking); Stage 4 (embeddings) is next.
 
 ## The problem
 
@@ -25,9 +25,9 @@ and says "not found" when the sources don't cover the question.
 | Stage | What | Status |
 |---|---|---|
 | 1 | Data collection: git docs, docs website, GitHub GraphQL, Stack Exchange API, own notes | ✅ |
-| 2 | Parsing & cleaning into one `Document` format with metadata | ⏳ |
-| 3 | Chunking (content-aware: docs by heading, issues by thread, code intact) | |
-| 4 | Embeddings + vector store (local, open-source) | |
+| 2 | Parsing & cleaning into one `Document` format with metadata (66,768 → 61,606 docs) | ✅ |
+| 3 | Chunking: docs by heading, answers prefixed with their question, code intact (259,186 chunks; 0 cut code blocks vs 20.5% naive) | ✅ |
+| 4 | Embeddings + vector store (local, open-source) | ⏳ |
 | 5 | Retrieval: BM25 + vector hybrid, metadata filters, reranking | |
 | 6 | Generation with citations and refusal (open-source LLM first) | |
 | 7 | Evaluation on real held-out questions vs. a plain-LLM baseline | |
@@ -61,7 +61,8 @@ src/robodocs/collect/         one collector per source (resumable, rate-limit aw
   notes.py                    own notes with secret/IP redaction
   pack.py                     many small JSON files → JSONL
   coverage_audit.py           FTS5/BM25 audit of corpus coverage
-src/robodocs/process/clean.py HTML-entity fixing, ROS 1 / ROS 2 labeling
+src/robodocs/process/          Stage 2: rst/html → Markdown, cleaning, version detection, parsers, dedup
+src/robodocs/chunk/            Stage 3: content-aware chunker + naive baseline comparison
 docs/PROJECT_SCOPE.md         requirements & scope
 docs/records/                 per-stage records and audit results
 tests/                        unit tests (pytest)
@@ -80,6 +81,8 @@ python -m robodocs.collect.website
 python -m robodocs.collect.github
 python -m robodocs.collect.stackexchange
 python -m robodocs.collect.pack
+python -m robodocs.process.run    # Stage 2
+python -m robodocs.chunk.run      # Stage 3
 pytest -q
 ```
 
